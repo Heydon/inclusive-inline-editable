@@ -7,7 +7,7 @@ An accessible implementation of `contenteditable` that allows HTML editing.
 * Ability to edit any element using `contenteditable` as standard or converted to HTML code
 * Disallow unwanted tags
 * Keyboard and screen reader accessible, with focus management
-* Emission of `disallowed` and `save` events
+* Emission of `startEdit`, `saveEdit`, and `disallowed` events
 
 ## Initialization
 
@@ -19,35 +19,35 @@ var editable = new InlineEditable('#heading', '#button')
 
 ## Options
 
-The third, optional argument is the options object. For example, you may want to enforce the use of `aria-label` for labeling the trigger button. This may be useful if you are using icons to represent the button.
+* `allowHTML` **(boolean):** Whether to serialize the editable's content as a string representation of its HTML, for HTML editing (default: `true`)
+* `disallowedTags` **(array):** Array of tags **in addition to script tags** that the user cannot include when editing. If a disallowed tag is used, the `disallowed` event is emitted when the user tries to save (default: `['input', 'textarea', 'select', 'button', 'br']`)
+
+### Disallowing just links example
 
 ```js
-var editable = new InlineEditable('#heading', '#button' {
-  ARIALabels: true
+var editable = new InlineEditable('#heading', '#button', {
+  disallowed: ['a']
 })
 ```
-
-### All options
-
-* `saveLabel` **(string):** The label for the button when the editable is in its active state (default: 'save')
-* `ARIALabels` **(boolean):** Whether to use hidden labels in the form of `aria-label="label"` for each state (default: `false`)
-* `allowHTML` **(boolean):** Whether to serialize the editable's content as a string representation of its HTML, for HTML editing (default: `true`)
-* `disallowedTags` **(array):** Array of tags that the user cannot include when editing. If a disallowed tag is used, the `disallowed` event is emitted when the 'save' button is clicked and the editable element does not save (default: `['input', 'textarea', 'select', 'button', 'br']`)
 
 ## Adding listeners
 
-### `save` example
+The `startEdit` and `saveEdit` events are supplied a `data` object that contains the `editButton` and the `editable` as nodes.
+
+### `saveEdit` example
 
 ```js
-editable.on('save', function (content) {
-  console.log('Saved content:', content)
+editable.on('saveEdit', function (data) {
+  console.log('Saved content:', data.editable.innerHTML)
 })
 ```
+
+The `disallowed` event's `data` object also includes the offending disallowed element as `badElement`. This is the first disallowed element the script finds; there may be others.
 
 ### `disallowed` example
 
 ```js
-editable.on('disallowed', function (node) {
-  alert('<' + node.nodeName.toLowerCase() + '> element not allowed!')
+editable.on('disallowed', function (data) {
+  alert('<' + data.badElement.nodeName.toLowerCase() + '> element not allowed!')
 })
 ```
