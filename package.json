@@ -1,0 +1,31 @@
+{
+  "name": "inclusive-inline-editable",
+  "version": "0.1.2",
+  "description": "A module for editing content inline using an accessible contenteditable implementation",
+  "main": "inclusive-inline-editable.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard ./inclusive-inline-editable.js",
+    "uglify": "uglifyjs inclusive-inline-editable.js -o inclusive-inline-editable.min.js",
+    "extract-version": "cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'",
+    "add-version": "echo \"/*! inclusive-inline-editable $(npm run extract-version --silent) — © Heydon Pickering */\n$(cat inclusive-inline-editable.min.js)\" > inclusive-inline-editable.min.js",
+    "build": "npm run uglify && npm run add-version",
+    "precommit": "npm run lint && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Heydon/inclusive-inline-editable.git"
+  },
+  "keywords": [],
+  "author": "Heydon Pickering",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Heydon/inclusive-inline-editable/issues"
+  },
+  "homepage": "https://github.com/Heydon/inclusive-inline-editable#readme",
+  "devDependencies": {
+    "husky": "^0.13.3",
+    "standard": "^10.0.2",
+    "uglify-js": "^2.8.22"
+  }
+}
