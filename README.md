@@ -21,6 +21,7 @@ var editable = new InlineEditable('#heading', '#button')
 
 * `allowHTML` **(boolean):** Whether to serialize the editable's content as a string representation of its HTML, for HTML editing (default: `true`)
 * `disallowedTags` **(array):** Array of tags **in addition to script tags** that the user cannot include when editing. If a disallowed tag is used, the `disallowed` event is emitted when the user tries to save (default: `['input', 'textarea', 'select', 'button', 'br']`)
+* `textareaMode` **(boolean)**: The editable behaves like a `<textarea>`, allowing carriage returns and taking the `aria-multiline="true"` attribute (default: `false`)
 
 ### Disallowing just links example
 

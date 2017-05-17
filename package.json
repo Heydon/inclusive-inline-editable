@@ -1,6 +1,6 @@
 {
   "name": "inclusive-inline-editable",
-  "version": "0.1.2",
+  "version": "0.0.1",
   "description": "A module for editing content inline using an accessible contenteditable implementation",
   "main": "inclusive-inline-editable.js",
   "scripts": {

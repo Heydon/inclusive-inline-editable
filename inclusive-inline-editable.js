@@ -10,7 +10,8 @@
     // The default settings for the module.
     this.settings = {
       allowHTML: true,
-      disallowedTags: ['input', 'textarea', 'select', 'button', 'br']
+      disallowedTags: ['input', 'textarea', 'select', 'button', 'br'],
+      textareaMode: false
     }
 
     // Overwrite defaults where they are provided in options
@@ -23,12 +24,17 @@
     // Save a reference to the edit button
     this.editButton = document.querySelector(button)
 
+    // Throw error if wrong element is used
+    if (this.editButton.nodeName !== 'BUTTON') {
+      throw new Error('InlineEditable edit buttons need to be <button> elements.')
+    }
+
     // Save a reference to the editable element.
     this.editable = document.querySelector(editable)
 
     // Error if editButton is a child of editable
     if (this.editable.contains(this.editButton)) {
-      throw new Error('Inline editables cannot contain the buttons that control them.')
+      throw new Error('InlineEditables cannot contain the buttons that control them.')
     }
 
     // Start out of editMode
@@ -37,7 +43,7 @@
     // Named function for key-based confirm
     this.keyConfirm = function (e) {
       var key = e.which || e.keyCode || 0
-      if (key === 13 || (key === 83 && (e.ctrlKey || e.metaKey))) {
+      if ((key === 13 && !this.settings.textareaMode) || (key === 83 && (e.ctrlKey || e.metaKey))) {
         e.preventDefault()
         this.saveEdit()
         if (this.valid) {
@@ -60,6 +66,9 @@
   InlineEditable.prototype.startEdit = function () {
     this.editable.setAttribute('contenteditable', true)
     this.editable.setAttribute('role', 'textbox')
+    if (this.settings.textareaMode) {
+      this.editable.setAttribute('aria-multiline', 'true')
+    }
 
     // If HTML is allowed, convert HTML to text
     if (this.settings.allowHTML) {
@@ -120,6 +129,9 @@
     if (this.valid) {
       this.editable.removeAttribute('contenteditable')
       this.editable.removeAttribute('role')
+      if (this.settings.textareaMode) {
+        this.editable.removeAttribute('aria-multiline')
+      }
 
       if (this.settings.allowHTML) {
         // Write HTML back to editable
