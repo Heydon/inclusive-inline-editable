@@ -10,7 +10,7 @@
     // The default settings for the module.
     this.settings = {
       allowHTML: true,
-      disallowedTags: ['input', 'textarea', 'select', 'button', 'br'],
+      allowedTags: ['em', 'strong', 'a'],
       textareaMode: false,
       charLimit: false
     }
@@ -145,11 +145,9 @@
     var proxy = this.createProxy(this.editable.textContent)
 
     if (this.settings.allowHTML) {
-      // Remove script tags and disallowed tags
-      this.settings.disallowedTags.push('script')
-      var childElems = proxy.querySelectorAll(this.settings.disallowedTags.join(','))
+      var childElems = proxy.querySelectorAll('*')
       Array.prototype.forEach.call(childElems, function (childElem) {
-        if (childElem) {
+        if (this.settings.allowedTags.indexOf(childElem) < 0) {
           this.valid = false
           // Fire disallowed event
           this._fire('disallowed', {
