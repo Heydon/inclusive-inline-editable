@@ -10,7 +10,7 @@
     // The default settings for the module.
     this.settings = {
       allowHTML: true,
-      allowedTags: ['em', 'strong', 'a'],
+      allowedTags: ['em', 'strong', 'a', 'span'],
       textareaMode: false,
       charLimit: false
     }
@@ -24,11 +24,6 @@
 
     // Save a reference to the edit button
     this.editButton = document.querySelector(button)
-
-    // Throw error if wrong element is used
-    if (this.editButton.nodeName !== 'BUTTON') {
-      throw new Error('InlineEditable edit buttons need to be <button> elements.')
-    }
 
     // Save a reference to the editable element.
     this.editable = document.querySelector(editable)
