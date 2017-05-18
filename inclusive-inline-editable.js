@@ -146,7 +146,8 @@
     if (this.settings.allowHTML) {
       var childElems = proxy.querySelectorAll('*')
       Array.prototype.forEach.call(childElems, function (childElem) {
-        if (this.settings.allowedTags.indexOf(childElem) < 0) {
+        console.log(this.settings.allowedTags.indexOf(childElem) < 0)
+        if (this.settings.allowedTags.indexOf(childElem.nodeName.toLowerCase()) < 0) {
           this.valid = false
           // Fire disallowed event
           this._fire('disallowed', {
@@ -168,13 +169,6 @@
       if (this.settings.allowHTML) {
         // Write HTML back to editable
         this.editable.innerHTML = proxy.innerHTML
-      }
-
-      // Change label
-      if (this.settings.ARIALabels) {
-        this.editButton.setAttribute('aria-label', this.settings.editLabel)
-      } else {
-        this.editButton.textContent = this.settings.editLabel
       }
 
       // save Boolean to object
