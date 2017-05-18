@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <style>
+    /* basic page styles */
+    html {
+      font-size: 150%;
+      font-family: sans-serif;
+      padding: 1em;
+      text-align: center;
+    }
+
+    * {
+      font-family: inherit;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+    }
+
+    h1 {
+      font-weight: normal;
+      font-size: 1.5rem
+    }
+
+    button {
+      padding: 0.25rem 1rem;
+      background: black;
+      color: white;
+      border: 0;
+      border-radius: 0.125rem;
+      margin: 0.5rem;
+      font-size: inherit;
+    }
+
+    [contenteditable] {
+      font-family: monospace;
+      border-radius: 0.125rem;
+    }
+
+    [contenteditable]:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.125rem yellow;
+    }
+
+    [contenteditable]:focus {
+      outline-offset: 0.125rem;
+    }
+    </style>
+    <title>
+      Inclusive Inline Editable | Toggling Button Label
+    </title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>This is my editable heading. <em>Wow!</em></h1>
+      <button>Edit</button>
+    </div>
+    <script src="../inclusive-inline-editable.js"></script>
+    <script>
+      var editable = new InlineEditable('h1', 'button', {
+        disallowedTags: ['input', 'textarea', 'select', 'button', 'div', 'p'],
+        charLimit: 50
+      })
+
+      editable.on('startEdit', function (data) {
+        data.editButton.textContent = 'Save'
+      })
+
+      editable.on('saveEdit', function (data) {
+        data.editButton.textContent = 'Edit'
+      })
+
+      editable.on('disallowed', function (data) {
+        alert('<' + data.badElement.nodeName.toLowerCase() + '> element not allowed!')
+      })
+    </script>
+  </body>
+</html>

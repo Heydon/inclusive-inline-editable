@@ -11,7 +11,8 @@
     this.settings = {
       allowHTML: true,
       disallowedTags: ['input', 'textarea', 'select', 'button', 'br'],
-      textareaMode: false
+      textareaMode: false,
+      charLimit: false
     }
 
     // Overwrite defaults where they are provided in options
@@ -37,6 +38,18 @@
       throw new Error('InlineEditables cannot contain the buttons that control them.')
     }
 
+    // Place caret at end of editable element
+    this.caretToEnd = function () {
+      if (document.createRange) {
+        var range = document.createRange()
+        range.selectNodeContents(this.editable)
+        range.collapse(false)
+        var selection = window.getSelection()
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+    }
+
     // Start out of editMode
     this.editMode = false
 
@@ -52,13 +65,44 @@
       }
     }
 
+    // Create proxy helper
+    this.createProxy = function (string) {
+      var proxyElem = document.createElement('span')
+      proxyElem.innerHTML = string
+      return proxyElem
+    }
+
+    this.limitCheck = function (e) {
+      // Create proxy to get character length exclusing HTML tags
+      var proxy = this.createProxy(this.editable.textContent)
+      var chars = proxy.textContent.length
+      if (chars > this.settings.charLimit) {
+        // Fire limited event
+        this._fire('limited')
+
+        // Remove extra characters, not including whole HTML tags
+        // (works with copy/paste as well as typing)
+        proxy = this.createProxy(this.editable.textContent)
+        var toRemove = proxy.textContent.length - this.settings.charLimit
+        this.editable.textContent = this.editable.textContent.substring(0, this.editable.textContent.length - toRemove)
+
+        // Move caret to end of editable again
+        this.caretToEnd()
+      }
+    }
+
     // Save on Enter of save key combinations
     this.editable.addEventListener('keydown', this.keyConfirm.bind(this))
 
     // Add toggle listener to button
     this.editButton.addEventListener('click', this.toggleMode.bind(this))
 
-    // initiate listeners object for public events
+    // Execute limitCheck if there is a character limit set
+    if (this.settings.charLimit) {
+      this.editable.addEventListener('input', this.limitCheck.bind(this))
+    }
+
+    // Initiate listeners object for public events
     this._listeners = {}
   }
 
@@ -75,15 +119,7 @@
       this.editable.textContent = this.editable.innerHTML
     }
 
-    // Place caret at end of editable element
-    if (document.createRange) {
-      var range = document.createRange()
-      range.selectNodeContents(this.editable)
-      range.collapse(false)
-      var selection = window.getSelection()
-      selection.removeAllRanges()
-      selection.addRange(range)
-    }
+    this.caretToEnd()
 
     // Focus the editable element
     this.editable.focus()
@@ -106,8 +142,7 @@
     this.valid = true
 
     // Use proxy to process content
-    var proxy = document.createElement('span')
-    proxy.innerHTML = this.editable.textContent
+    var proxy = this.createProxy(this.editable.textContent)
 
     if (this.settings.allowHTML) {
       // Remove script tags and disallowed tags
@@ -202,10 +237,10 @@
 
   // Destroy method for removing all listeners
   InlineEditable.prototype.destroy = function () {
-    // Remove toggle listener on button
-    // and key binding on editable
+    // Remove internal listeners
     this.editButton.removeEventListener('click', this.toggleMode)
     this.editable.removeEventListener('keydown', this.keyConfirm)
+    this.editable.removeEventListener('input', this.limitCheck)
 
     // Empty listeners object
     this._listeners = {}
