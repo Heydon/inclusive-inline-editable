@@ -24,21 +24,26 @@ var editable = new InlineEditable('#heading', '#button')
 * `textareaMode` **(boolean)**: The editable behaves like a `<textarea>`, allowing carriage returns and taking the `aria-multiline="true"` attribute (default: `false`)
 * `charLimit` **(false or number)**: If set, this will limit the number of characters one can enter in the editable. Is based on the `textContent` length, not the serialized HTML string length, so excludes HTML tags in the count (default: `false`)
 
-### Disallowing just links example
+### Allowing just `<em>`s and `<strong>`s example
 
 ```js
 var editable = new InlineEditable('#heading', '#button', {
-  disallowed: ['a']
+  allowedTags: ['em', 'strong']
 })
 ```
 
-_(Note: This will allow the explicit coding of `<br>` tags if `allowHTML` is set to true, but soft or hard carriage returns will simply save the state and convert from string to HTML.)_
+## Events
 
-## Adding listeners
+* `startEdit` → when the editable element becomes editable and focus is moved to it
+* `saveEdit` → when the editable element is valid and the user has hit <kbd>cmd</kmd> + <kbd>s</kbd>, or <kbd>Enter</kbd>, or clicked the edit button to save.
+* `disallowed` → when saving is suppressed because disallowed HTML tags (tags not included in the  `allowedTags` option) have been used
+* `limited` → when the character limit (set with `charLimit`) has been reached and any extra characters have been removed
+
+### Adding listeners
 
 The `startEdit` and `saveEdit` events are supplied a `data` object that contains the `editButton` and the `editable` as nodes.
 
-### `saveEdit` example
+#### `saveEdit` example
 
 ```js
 editable.on('saveEdit', function (data) {
@@ -48,10 +53,20 @@ editable.on('saveEdit', function (data) {
 
 The `disallowed` event's `data` object also includes the offending disallowed element as `badElement`. This is the first disallowed element the script finds; there may be others.
 
-### `disallowed` example
+#### `disallowed` example
 
 ```js
 editable.on('disallowed', function (data) {
   alert('<' + data.badElement.nodeName.toLowerCase() + '> element not allowed!')
+})
+```
+
+#### `limited` example
+
+The `limited` event's data object includes the `charLimit` value.
+
+```js
+editable.on('limited', function (data) {
+  console.log(data.charLimit + ' characters reached!')
 })
 ```

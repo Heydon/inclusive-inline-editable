@@ -78,7 +78,11 @@
       var chars = proxy.textContent.length
       if (chars > this.settings.charLimit) {
         // Fire limited event
-        this._fire('limited')
+        this._fire('limited', {
+          editButton: this.editButton,
+          editable: this.editable,
+          charLimit: this.settings.charLimit
+        })
 
         // Remove extra characters, not including whole HTML tags
         // (works with copy/paste as well as typing)

@@ -84,6 +84,10 @@
       editable.on('disallowed', function (data) {
         alert('<' + data.badElement.nodeName.toLowerCase() + '> element not allowed!')
       })
+
+      editable.on('limited', function (data) {
+        console.log(data.charLimit + ' characters reached!')
+      })
     </script>
   </body>
 </html>
