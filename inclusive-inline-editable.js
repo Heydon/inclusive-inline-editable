@@ -33,7 +33,19 @@
       throw new Error('InlineEditables cannot contain the buttons that control them.')
     }
 
-    // Place caret at end of editable element
+    // Create proxy helper
+    this.createProxy = function (string) {
+      var proxyElem = document.createElement('span')
+      proxyElem.innerHTML = string
+      return proxyElem
+    }
+
+    // Save inital content as string
+    var proxy = this.createProxy(this.editable.textContent)
+    proxy.textContent = this.editable.innerHTML
+    this.savedContent = proxy.textContent
+
+    // Place caret at end of editable element helper
     this.caretToEnd = function () {
       if (document.createRange) {
         var range = document.createRange()
@@ -60,13 +72,6 @@
       }
     }
 
-    // Create proxy helper
-    this.createProxy = function (string) {
-      var proxyElem = document.createElement('span')
-      proxyElem.innerHTML = string
-      return proxyElem
-    }
-
     this.limitCheck = function (e) {
       // Create proxy to get character length exclusing HTML tags
       var proxy = this.createProxy(this.editable.textContent)
@@ -79,14 +84,14 @@
           charLimit: this.settings.charLimit
         })
 
-        // Remove extra characters, not including whole HTML tags
-        // (works with copy/paste as well as typing)
-        proxy = this.createProxy(this.editable.textContent)
-        var toRemove = proxy.textContent.length - this.settings.charLimit
-        this.editable.textContent = this.editable.textContent.substring(0, this.editable.textContent.length - toRemove)
+        // Reset to original saved content
+        this.editable.textContent = this.savedContent
 
         // Move caret to end of editable again
         this.caretToEnd()
+      } else {
+        // Update saved content
+        this.savedContent = this.editable.textContent
       }
     }
 
@@ -146,7 +151,6 @@
     if (this.settings.allowHTML) {
       var childElems = proxy.querySelectorAll('*')
       Array.prototype.forEach.call(childElems, function (childElem) {
-        console.log(this.settings.allowedTags.indexOf(childElem) < 0)
         if (this.settings.allowedTags.indexOf(childElem.nodeName.toLowerCase()) < 0) {
           this.valid = false
           // Fire disallowed event
@@ -160,16 +164,24 @@
     }
 
     if (this.valid) {
+      // Make the editable a simple node again
       this.editable.removeAttribute('contenteditable')
       this.editable.removeAttribute('role')
       if (this.settings.textareaMode) {
         this.editable.removeAttribute('aria-multiline')
       }
 
+      var nbspRemoved
+
       if (this.settings.allowHTML) {
         // Write HTML back to editable
-        this.editable.innerHTML = proxy.innerHTML
+        // with &nbsp; instances removed
+        nbspRemoved = proxy.innerHTML.replace(/&nbsp;/g, '')
+      } else {
+        nbspRemoved = this.editable.innerHTML.replace(/&nbsp;/g, '')
       }
+
+      this.editable.innerHTML = nbspRemoved
 
       // save Boolean to object
       this.editMode = false
