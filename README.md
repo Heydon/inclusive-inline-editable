@@ -52,13 +52,20 @@ editable.on('saveEdit', function (data) {
 })
 ```
 
-The `disallowed` event's `data` object also includes the offending disallowed element as `badElement`. This is the first disallowed element the script finds; there may be others.
-
 #### `disallowed` example
+
+The `disallowed` event's `data` object also includes the an array of the offending disallowed elements as `badElems`. Here's how one might alert the user to which disallowed elements have been included:
 
 ```js
 editable.on('disallowed', function (data) {
-  alert('<' + data.badElement.nodeName.toLowerCase() + '> element not allowed!')
+  var badNodes = data.badElems.map(function(bad) {
+    return '<' + bad.nodeName.toLowerCase() + '>'
+  })
+  var uniqueBadNodes = badNodes.filter(function(elem, index, self) {
+    return index == self.indexOf(elem)
+  })
+  var badString = uniqueBadNodes.join(', ')
+  alert(badString + ' not allowed!') // e.g. "<blockquote>, <figure> not allowed!"
 })
 ```
 

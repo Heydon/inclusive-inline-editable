@@ -150,20 +150,23 @@
 
     if (this.settings.allowHTML) {
       var childElems = proxy.querySelectorAll('*')
+      this.badElems = []
       Array.prototype.forEach.call(childElems, function (childElem) {
         if (this.settings.allowedTags.indexOf(childElem.nodeName.toLowerCase()) < 0) {
           this.valid = false
-          // Fire disallowed event
-          this._fire('disallowed', {
-            editButton: this.editButton,
-            editable: this.editable,
-            badElement: childElem
-          })
+          this.badElems.push(childElem)
         }
       }.bind(this))
     }
 
-    if (this.valid) {
+    if (!this.valid) {
+      // Fire the disallowed event
+      this._fire('disallowed', {
+        editButton: this.editButton,
+        editable: this.editable,
+        badElems: this.badElems
+      })
+    } else {
       // Make the editable a simple node again
       this.editable.removeAttribute('contenteditable')
       this.editable.removeAttribute('role')

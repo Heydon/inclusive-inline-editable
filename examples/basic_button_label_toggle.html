@@ -81,7 +81,14 @@
       })
 
       editable.on('disallowed', function (data) {
-        alert('<' + data.badElement.nodeName.toLowerCase() + '> element not allowed!')
+        var badNodes = data.badElems.map(function(bad) {
+          return '<' + bad.nodeName.toLowerCase() + '>'
+        })
+        var uniqueBadNodes = badNodes.filter(function(elem, index, self) {
+          return index == self.indexOf(elem)
+        })
+        var badString = uniqueBadNodes.join(', ')
+        alert(badString + ' not allowed!')
       })
 
       editable.on('limited', function (data) {
