@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <style>
+    /* basic page styles */
+    html {
+      font-size: 150%;
+      font-family: sans-serif;
+      padding: 1em;
+    }
+
+    * {
+      font-family: inherit;
+    }
+
+    * + * {
+      margin-top: 1.5rem;
+    }
+
+    h1 {
+      font-weight: normal;
+      font-size: 1.5rem
+    }
+
+    button {
+      padding: 0.25rem 1rem;
+      background: black;
+      color: white;
+      border: 0;
+      border-radius: 0.125rem;
+      font-size: inherit;
+    }
+
+    .editable {
+      text-align: left;
+    }
+
+    [contenteditable] {
+      font-family: monospace;
+      border-radius: 0.125rem;
+      white-space: pre-wrap;
+    }
+
+    [contenteditable]:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.125rem yellow;
+    }
+
+    [contenteditable]:focus {
+      outline-offset: 0.125rem;
+    }
+    </style>
+    <title>
+      Inclusive Inline Editable | Toggling Button Label
+    </title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="editable">
+<h1>This is my editable heading. <em>Wow!</em></h1>
+
+<p>And this is a paragraph following my heading. It <a href="#">has a link</a> in it.</p>
+      </div>
+      <div>
+        <button>Edit</button>
+      </div>
+    </div>
+    <script src="../inclusive-inline-editable.js"></script>
+    <script>
+      var editable = new InlineEditable('.editable', 'button', {
+        charLimit: 500,
+        allowedTags: ['h1', 'h2', 'h3', 'p', 'blockquote', 'a', 'strong', 'em'],
+        textareaMode: true
+      })
+
+      editable.on('startEdit', function (data) {
+        data.editButton.textContent = 'Save'
+      })
+
+      editable.on('saveEdit', function (data) {
+        data.editButton.textContent = 'Edit'
+      })
+
+      editable.on('disallowed', function (data) {
+        alert('<' + data.badElement.nodeName.toLowerCase() + '> element not allowed!')
+      })
+
+      editable.on('limited', function (data) {
+        console.log(data.charLimit + ' characters reached!')
+      })
+    </script>
+  </body>
+</html>
